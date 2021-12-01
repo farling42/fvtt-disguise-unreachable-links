@@ -9,3 +9,8 @@ When displaying journal entries or actors to players, if the linked document is 
 Thus players will not realise that there is another document to which they don't have access.
 
 *By accessible, we mean that the player has at least LIMITED permission on that document*
+
+## Support
+
+If you like what it does, then all contributions will be gratefully received at [Kofi](https://ko-fi.com/farling) or [Paypal](https://paypal.me/farling)
+or if you're feeling really generous you could set up a regular contribution at [Patreon](https://www.patreon.com/amusingtime) 
