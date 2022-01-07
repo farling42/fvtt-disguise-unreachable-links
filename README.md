@@ -1,3 +1,5 @@
+![Latest Release Download Count](https://img.shields.io/github/downloads/farling42/fvtt-disguise-unreachable-links/latest/module.zip)
+
 # Introduction
 
 This very small module performs one simple task: hide links which are not reachable by players.
