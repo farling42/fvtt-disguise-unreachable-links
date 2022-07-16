@@ -1,11 +1,14 @@
 //
 // Simple hooks to prevent links being displayed as links if the target of the link isn't OBSERVABLE by the player.
 //
-const _EntityMap = {
+const TypeMap = {
 	"JournalEntry" : "journal",
 	"Actor"        : "actors",
 	"RollTable"    : "tables",
 	"Scene"        : "scenes",
+	"Cards"        : "cards",
+	"Playlist"     : "playlists",
+	"Item"         : "items",
 };
 
 /**
@@ -21,28 +24,33 @@ function _checkRenderLinks(sheet, html, data) {
 	// data  = object
 	
 	// Original link:
-	//     <a class="entity-link" draggable="true" [ data-entity="JournalEntry" | data-pack="packname" ] data-id=".....">
+	//     <a class="content-link" draggable="true" [ data-type="JournalEntry" | data-pack="packname" ] [ data-id="{id}" ] data-uuid="JournalEntry.{id}>">
 	//     <i class="fas fa-th-list">::before</i>
 	//     plain text
 	//     </a>
 	// If the "data-id" isn't observable by the current user, then replace with just "plain text"
-	html.find("a.entity-link").filter( (index,a) => {
+	html.find("a.content-link").filter( (index,a) => {
 		// This filter function needs to return true if the link is to be replaced by normal text
-		const dataentity = a.getAttribute('data-entity');	// RollTable, JournalEntry, Actor
-		if (!dataentity) {
-			// Compendium packs are only limited at the PACK level, not an individual document level
-			return game.packs.get(a.getAttribute('data-pack'))?.private;
-		}
-		const entity = _EntityMap[dataentity];
-		if (!entity) {
-			console.warn(`checkRenderLinks#EntityMap does not have '${entity}'`);
+
+		// Firstly, check packs at the compendium level
+		let pack = a.getAttribute('data-pack');
+		if (pack) return game.packs.get(pack)?.private;
+
+		const datatype = a.getAttribute('data-type');	// RollTable, JournalEntry, Actor
+		if (!datatype) return false;
+
+		const gametype = TypeMap[datatype];
+		if (!gametype) {
+			console.warn(`checkRenderLinks#TypeMap does not have '${datatype}'`);
 			return false;
 		}
-		const item = game[entity].get(a.getAttribute("data-id"));
+		let id = a.getAttribute("data-id");
+		if (!id) id = a.getAttribute("data-uuid").split('.').pop();
+		const item = game[gametype].get(id);
 		return !item || !item.testUserPermission(game.user, "LIMITED");
 	}).replaceWith ( (index,a) => {
-		const pos = a.indexOf("</i> ");
-		return (pos<0) ? a : a.slice(pos+5);
+		const pos = a.indexOf("</i>");
+		return (pos<0) ? a : a.slice(pos+4);
 	});
 }
 
@@ -52,6 +60,7 @@ Hooks.once('ready', () => {
 	if (!game.user.isGM) {
 		console.warn(`Adding hooks to disguise unreachable links`);
 		Hooks.on("renderJournalSheet", _checkRenderLinks);
+		Hooks.on("renderJournalPageSheet", _checkRenderLinks);
 		Hooks.on("renderActorSheet",   _checkRenderLinks);
 	}
 })
