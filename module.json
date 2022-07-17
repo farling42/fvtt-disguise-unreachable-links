@@ -1,10 +1,13 @@
 {
   "id": "disguise-unreachable-links",
+  "name": "disguise-unreachable-links",
   "title": "Disguise Unreachable Links",
   "description": "Remove display of links to players where the linked document is not accessible by that player",
   "version": "This is auto replaced",
   "library": "false",
-	"compatibility": {
+  "minimumCoreVersion": "10",
+  "compatibleCoreVersion": "10",
+  "compatibility": {
 		"minimum" : "10",
 		"verified": "10.273",
 		"maximum" : "10"
