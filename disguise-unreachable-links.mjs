@@ -1,15 +1,6 @@
 //
 // Simple hooks to prevent links being displayed as links if the target of the link isn't OBSERVABLE by the player.
 //
-const TypeMap = {
-	"JournalEntry" : "journal",
-	"Actor"        : "actors",
-	"RollTable"    : "tables",
-	"Scene"        : "scenes",
-	"Cards"        : "cards",
-	"Playlist"     : "playlists",
-	"Item"         : "items",
-};
 
 /**
  * For any link in the text which points to a document which is not visible to the current player
@@ -36,18 +27,13 @@ function _checkRenderLinks(sheet, html, data) {
 		let pack = a.getAttribute('data-pack');
 		if (pack) return game.packs.get(pack)?.private;
 
-		const datatype = a.getAttribute('data-type');	// RollTable, JournalEntry, Actor
-		if (!datatype) return false;
+		// Now we can use the uuid to check for general access to the relevant document
+		let uuid = a.getAttribute('data-uuid');
+		if (!uuid) return false;
+		let doc = fromUuidSync(uuid);
+		if (!doc) return false;
+		return !doc.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED);
 
-		const gametype = TypeMap[datatype];
-		if (!gametype) {
-			console.warn(`checkRenderLinks#TypeMap does not have '${datatype}'`);
-			return false;
-		}
-		let id = a.getAttribute("data-id");
-		if (!id) id = a.getAttribute("data-uuid").split('.').pop();
-		const item = game[gametype].get(id);
-		return !item || !item.testUserPermission(game.user, "LIMITED");
 	}).replaceWith ( (index,a) => {
 		const pos = a.indexOf("</i>");
 		return (pos<0) ? a : a.slice(pos+4);
@@ -59,8 +45,8 @@ Hooks.once('ready', () => {
 	console.warn(`disguise unreachable links: ready hook`);
 	if (!game.user.isGM) {
 		console.warn(`Adding hooks to disguise unreachable links`);
-		Hooks.on("renderJournalSheet", _checkRenderLinks);
+		Hooks.on("renderJournalSheet",     _checkRenderLinks);
 		Hooks.on("renderJournalPageSheet", _checkRenderLinks);
-		Hooks.on("renderActorSheet",   _checkRenderLinks);
+		Hooks.on("renderActorSheet",       _checkRenderLinks);
 	}
 })
