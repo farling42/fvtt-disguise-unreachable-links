@@ -44,7 +44,6 @@ Hooks.once('ready', () => {
 	// Only check for link visibility if NOT a gm
 	console.warn(`disguise unreachable links: ready hook`);
 	if (!game.user.isGM) {
-		console.warn(`Adding hooks to disguise unreachable links`);
 		Hooks.on("renderJournalSheet",     _checkRenderLinks);
 		Hooks.on("renderJournalPageSheet", _checkRenderLinks);
 		Hooks.on("renderActorSheet",       _checkRenderLinks);
