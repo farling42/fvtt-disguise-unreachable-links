@@ -1,3 +1,8 @@
+## 2.2.2
+
+- Update verified version to 10.291
+- Change warning into a debug message which is only output when enabled (thus only for players)
+
 ## 2.2.1
 
 Remove "compatibility.maximum" flag from module.json so that it will work in Foundry 11
