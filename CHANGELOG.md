@@ -1,3 +1,7 @@
+## 2.2.3
+
+- Update verified version to 11.299
+
 ## 2.2.2
 
 - Update verified version to 10.291
