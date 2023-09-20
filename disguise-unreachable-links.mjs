@@ -25,12 +25,16 @@ function _checkRenderLinks(sheet, html, data) {
 
 		// Firstly, check packs at the compendium level
 		let pack = a.getAttribute('data-pack');
-		if (pack) return game.packs.get(pack)?.private;
+		let doc;
+		if (pack) {
+			doc = game.packs.get(pack);
+		} else {
+			let uuid = a.getAttribute('data-uuid');
+			if (!uuid) return false;
+			doc = fromUuidSync(uuid);	
+		}
 
-		// Now we can use the uuid to check for general access to the relevant document
-		let uuid = a.getAttribute('data-uuid');
-		if (!uuid) return false;
-		let doc = fromUuidSync(uuid);
+		// Now we can use the uuid to check for general access to the relevant document (or compendium pack)
 		if (!doc) return false;
 		return !doc.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED);
 
