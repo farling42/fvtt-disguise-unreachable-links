@@ -1,3 +1,7 @@
+## 2.3.1
+
+- Update verified version to 12.327
+
 ## 2.3.0
 
 - Fix an issue in Foundry V11 where links to compendiums with LIMITED visibility where being hidden.
