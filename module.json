@@ -4,7 +4,6 @@
   "title": "Disguise Unreachable Links",
   "description": "Remove display of links to players where the linked document is not accessible by that player",
   "version": "This is auto replaced",
-  "library": "false",
   "minimumCoreVersion": "11",
   "compatibleCoreVersion": "11",
   "compatibility": {
