@@ -9,47 +9,70 @@
  * @param {jQuery}     [html]  HTML  for renderJournalSheet and renderActorSheet hooks
  * @param {Object}     [data]  Data for renderJournalSheet and renderActorSheet hooks
  */
-function _checkRenderLinks(sheet, html, data) {	
-	// sheet = ActorSheet
-	// html  = jQuery
-	// data  = object
-	
-	// Original link:
-	//     <a class="content-link" draggable="true" [ data-type="JournalEntry" | data-pack="packname" ] [ data-id="{id}" ] data-uuid="JournalEntry.{id}>">
-	//     <i class="fas fa-th-list">::before</i>
-	//     plain text
-	//     </a>
-	// If the "data-id" isn't observable by the current user, then replace with just "plain text"
-	html.find("a.content-link").filter( (index,a) => {
-		// This filter function needs to return true if the link is to be replaced by normal text
+function _checkRenderLinks(sheet, html, data) {
+  // sheet = ActorSheet
+  // html  = jQuery
+  // data  = object
 
-		// Firstly, check packs at the compendium level
-		let pack = a.getAttribute('data-pack');
-		let doc;
-		if (pack) {
-			doc = game.packs.get(pack);
-		} else {
-			let uuid = a.getAttribute('data-uuid');
-			if (!uuid) return false;
-			doc = fromUuidSync(uuid);	
-		}
+  // Original link:
+  //     <a class="content-link" draggable="true" [ data-type="JournalEntry" | data-pack="packname" ] [ data-id="{id}" ] data-uuid="JournalEntry.{id}>">
+  //     <i class="fas fa-th-list">::before</i>
+  //     plain text
+  //     </a>
+  // If the "data-id" isn't observable by the current user, then replace with just "plain text"
+  if (html instanceof jQuery) {
+    html.find("a.content-link").filter((index, a) => {
+      // This filter function needs to return true if the link is to be replaced by normal text
 
-		// Now we can use the uuid to check for general access to the relevant document (or compendium pack)
-		if (!doc) return false;
-		return !doc.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED);
+      // Firstly, check packs at the compendium level
+      let pack = a.getAttribute('data-pack');
+      let doc;
+      if (pack) {
+        doc = game.packs.get(pack);
+      } else {
+        let uuid = a.getAttribute('data-uuid');
+        if (!uuid) return false;
+        doc = fromUuidSync(uuid);
+      }
 
-	}).replaceWith ( (index,a) => {
-		const pos = a.indexOf("</i>");
-		return (pos<0) ? a : a.slice(pos+4);
-	});
+      // Now we can use the uuid to check for general access to the relevant document (or compendium pack)
+      if (!doc) return false;
+      return !doc.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED);
+
+    }).replaceWith((index, a) => {
+      const pos = a.indexOf("</i>");
+      return (pos < 0) ? a : a.slice(pos + 4);
+    });
+
+  } else {
+
+    const nodes = html.querySelectorAll("a.content-link");
+    for (const node of nodes) {
+      // Firstly, check packs at the compendium level
+      const pack = node.getAttribute('data-pack');
+      let doc;
+      if (pack) {
+        doc = game.packs.get(pack);
+      } else {
+        const uuid = node.getAttribute('data-uuid');
+        if (uuid) doc = fromUuidSync(uuid);
+      }
+
+      // Now we can use the uuid to check for general access to the relevant document (or compendium pack)
+      if (doc && !doc.testUserPermission(game.user, CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED)) {
+        node.outerHTML = node.innerText;
+      }
+    }
+  }
 }
 
 Hooks.once('ready', () => {
-	// Only check for link visibility if NOT a gm
-	if (!game.user.isGM) {
-		console.debug(`disguise unreachable links enabled for player`);
-		Hooks.on("renderJournalSheet",     _checkRenderLinks);
-		Hooks.on("renderJournalPageSheet", _checkRenderLinks);
-		Hooks.on("renderActorSheet",       _checkRenderLinks);
-	}
+  // Only check for link visibility if NOT a gm
+  if (!game.user.isGM) {
+    console.debug(`disguise unreachable links enabled for player`);
+    Hooks.on("renderJournalSheet", _checkRenderLinks);
+    Hooks.on("renderJournalPageSheet", _checkRenderLinks);
+    Hooks.on("renderActorSheet", _checkRenderLinks);
+    Hooks.on("renderJournalEntryPageSheet", _checkRenderLinks);  // V13
+  }
 })

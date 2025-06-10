@@ -1,7 +1,11 @@
+## 2.3.3
+
+- Get working on Foundry 13.345
+
 ## 2.3.2
 
 - Update verified version to 13.334
-- 
+ 
 ## 2.3.1
 
 - Update verified version to 12.327
