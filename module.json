@@ -1,6 +1,5 @@
 {
   "id": "disguise-unreachable-links",
-  "name": "disguise-unreachable-links",
   "title": "Disguise Unreachable Links",
   "description": "Remove display of links to players where the linked document is not accessible by that player",
   "version": "This is auto replaced",
